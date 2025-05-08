@@ -25,22 +25,15 @@ class SearchCityEvent extends WeatherEvent {
   List<Object> get props => [cityName];
 }
 
-class AddToFavoritesEvent extends WeatherEvent {
-  final Weather weather;
+class FetchCitySuggestionsEvent extends WeatherEvent {
+  final String query;
 
-  const AddToFavoritesEvent(this.weather);
-
-  @override
-  List<Object> get props => [weather];
-}
-
-class RemoveFromFavoritesEvent extends WeatherEvent {
-  final String favoriteId;
-
-  const RemoveFromFavoritesEvent(this.favoriteId);
+  const FetchCitySuggestionsEvent(this.query);
 
   @override
-  List<Object> get props => [favoriteId];
+  List<Object> get props => [query];
 }
+
+class ClearSuggestionsEvent extends WeatherEvent {}
 
 class LoadFavoritesEvent extends WeatherEvent {}

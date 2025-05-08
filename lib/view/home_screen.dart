@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather/weather.dart';
 import 'package:weather_app/bloc/navigation_cubit.dart';
 import 'package:weather_app/bloc/weather_bloc.dart';
 import 'package:weather_app/view/favorities_screen.dart';
@@ -48,21 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: BlocBuilder<WeatherBloc, WeatherState>(
             builder: (context, state) {
-              if (state is WeatherSuccess) {
-                return BlocBuilder<NavigationCubit, int>(
-                  builder: (context, currentIndex) {
-                    return IndexedStack(
-                      index: currentIndex,
-                      children: [
-                        _buildWeatherScreen(context, colors, isDaytime, state),
-                        const FavoritesScreen(),
-                      ],
-                    );
-                  },
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
+              return BlocBuilder<NavigationCubit, int>(
+                builder: (context, currentIndex) {
+                  return IndexedStack(
+                    index: currentIndex,
+                    children: [
+                      _buildWeatherContent(context, colors, isDaytime, state),
+                      const FavoritesScreen(),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ),
@@ -93,11 +90,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildWeatherContent(
+    BuildContext context,
+    List<Color> colors,
+    bool isDaytime,
+    WeatherState state,
+  ) {
+    if (state.weatherStatus == WeatherStatus.loading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state.weatherStatus == WeatherStatus.failure) {
+      return Center(child: Text('Error: ${state.errorMessage}'));
+    } else if (state.weatherStatus == WeatherStatus.success &&
+        state.weather != null) {
+      return _buildWeatherScreen(context, colors, isDaytime, state.weather!);
+    } else {
+      return const Center(child: Text('No weather data available'));
+    }
+  }
+
   Widget _buildWeatherScreen(
     BuildContext context,
     List<Color> colors,
     bool isDaytime,
-    WeatherSuccess state,
+    Weather weather,
   ) {
     return SingleChildScrollView(
       child: Column(
@@ -109,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(Icons.location_on, color: Colors.green, size: 20),
               const SizedBox(width: 8),
               Text(
-                '${state.weather.areaName ?? 'Unknown'}',
+                weather.areaName ?? 'Unknown',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w100,
@@ -120,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            '${state.weather.temperature?.celsius?.toInt() ?? 0}°C',
+            '${weather.temperature?.celsius?.toInt() ?? 0}°C',
             style: const TextStyle(
               fontSize: 68,
               fontWeight: FontWeight.w300,
@@ -131,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.network(
-                'https://openweathermap.org/img/wn/${state.weather.weatherIcon ?? '01d'}@2x.png',
+                'https://openweathermap.org/img/wn/${weather.weatherIcon ?? '01d'}@2x.png',
                 width: 50,
                 height: 50,
                 errorBuilder:
@@ -140,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(width: 10),
               Text(
-                '${state.weather.weatherDescription ?? 'N/A'}',
+                weather.weatherDescription ?? 'N/A',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w400,
@@ -150,13 +165,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           Text(
-            state.weather.date != null
-                ? DateFormat('EEEE dd ').add_jm().format(state.weather.date!)
+            weather.date != null
+                ? DateFormat('EEEE dd ').add_jm().format(weather.date!)
                 : 'N/A',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w300,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withOpacity(0.7),
             ),
           ),
           const SizedBox(height: 100),
@@ -182,13 +197,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          state.weather.sunrise != null
-                              ? '${state.weather.sunrise!.hour}:${state.weather.sunrise!.minute.toString().padLeft(2, '0')} AM'
+                          weather.sunrise != null
+                              ? '${weather.sunrise!.hour}:${weather.sunrise!.minute.toString().padLeft(2, '0')} AM'
                               : 'N/A',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -216,13 +231,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          state.weather.sunset != null
-                              ? '${state.weather.sunset!.hour}:${state.weather.sunset!.minute.toString().padLeft(2, '0')} PM'
+                          weather.sunset != null
+                              ? '${weather.sunset!.hour}:${weather.sunset!.minute.toString().padLeft(2, '0')} PM'
                               : 'N/A',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -233,14 +248,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Divider(
-            color: Colors.grey.withValues(alpha: 0.5),
+            color: Colors.grey.withOpacity(0.5),
             thickness: 1,
             height: 40,
             endIndent: 35,
             indent: 35,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 35.0),
+            padding: const EdgeInsets.symmetric(horizontal: 45.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -261,11 +276,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${state.weather.tempMax?.celsius?.toInt() ?? 0}°C',
+                          '${weather.tempMax?.celsius?.toInt() ?? 0}°C',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -293,11 +308,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${state.weather.tempMin?.celsius?.toInt() ?? 0}°C',
+                          '${weather.tempMin?.celsius?.toInt() ?? 0}°C',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(0.7),
                           ),
                         ),
                       ],
