@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather_app/bloc/location_bloc.dart';
 import 'package:weather_app/bloc/weather_bloc.dart';
 import 'package:weather_app/view/splash_screen.dart';
 import 'package:weather_app/view/home_screen.dart';
@@ -19,8 +20,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<WeatherBloc>(
-      create: (context) => WeatherBloc()..add(FetchWeatherEvent(position)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<WeatherBloc>(
+          create: (context) => WeatherBloc()..add(FetchWeatherEvent(position)),
+        ),
+        BlocProvider<LocationBloc>(create: (context) => LocationBloc()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Weather App',

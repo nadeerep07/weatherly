@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_app/bloc/location_bloc.dart';
+import 'package:weather_app/bloc/location_event.dart';
+import 'package:weather_app/bloc/location_state.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -10,6 +14,7 @@ class FavoritesScreen extends StatelessWidget {
         isDaytime
             ? [Colors.blue.shade300, Colors.blue.shade700]
             : [Colors.indigo.shade900, Colors.black];
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -27,6 +32,9 @@ class FavoritesScreen extends StatelessWidget {
                 vertical: 50,
               ),
               child: TextField(
+                onChanged: (value) {
+                  context.read<LocationBloc>().add(SearchLocationEvent(value));
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: isDaytime ? Colors.white : Colors.white54,
@@ -37,8 +45,35 @@ class FavoritesScreen extends StatelessWidget {
                   hintText: 'Enter city name',
                   prefixIcon: const Icon(Icons.search),
                 ),
-                onSubmitted: (value) {
-                  Navigator.pop(context, value);
+              ),
+            ),
+            Expanded(
+              child: BlocBuilder<LocationBloc, LocationState>(
+                builder: (context, state) {
+                  if (state.status == LocationStatus.loading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state.status == LocationStatus.success) {
+                    return ListView.builder(
+                      itemCount: state.locations.length,
+                      itemBuilder: (context, index) {
+                        final location = state.locations[index];
+                        return ListTile(
+                          title: Text(location.name),
+                          subtitle: Text(
+                            '${location.region}, ${location.country}',
+                          ),
+                          leading: const Icon(Icons.location_city),
+                          trailing: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.favorite_border_rounded),
+                          ),
+                        );
+                      },
+                    );
+                  } else if (state.status == LocationStatus.failure) {
+                    return Center(child: Text(state.error));
+                  }
+                  return const Center(child: Text('Start typing to search'));
                 },
               ),
             ),

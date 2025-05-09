@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather/weather.dart';
 import 'package:weather_app/bloc/navigation_cubit.dart';
 import 'package:weather_app/bloc/weather_bloc.dart';
+import 'package:weather_app/models/weather_data.dart';
 import 'package:weather_app/view/favorities_screen.dart';
 import 'package:weather_app/widgets/colors.dart';
-import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -112,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     List<Color> colors,
     bool isDaytime,
-    Weather weather,
+    WeatherData weather,
   ) {
     return SingleChildScrollView(
       child: Column(
@@ -124,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Icon(Icons.location_on, color: Colors.green, size: 20),
               const SizedBox(width: 8),
               Text(
-                weather.areaName ?? 'Unknown',
+                weather.city,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w100,
@@ -135,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            '${weather.temperature?.celsius?.toInt() ?? 0}°C',
+            '${weather.temperature.toString()}°C',
             style: const TextStyle(
               fontSize: 68,
               fontWeight: FontWeight.w300,
@@ -145,17 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.network(
-                'https://openweathermap.org/img/wn/${weather.weatherIcon ?? '01d'}@2x.png',
-                width: 50,
-                height: 50,
-                errorBuilder:
-                    (context, error, stackTrace) =>
-                        const Icon(Icons.cloud, size: 50),
-              ),
-              const SizedBox(width: 10),
+              Image.network(weather.iconUrl, width: 50, height: 50),
+              const SizedBox(width: 5),
               Text(
-                weather.weatherDescription ?? 'N/A',
+                weather.condition,
+
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w400,
@@ -165,13 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           Text(
-            weather.date != null
-                ? DateFormat('EEEE dd ').add_jm().format(weather.date!)
-                : 'N/A',
+            '${weather.region},${weather.country} ',
+
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w300,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 100),
@@ -197,13 +189,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          weather.sunrise != null
-                              ? '${weather.sunrise!.hour}:${weather.sunrise!.minute.toString().padLeft(2, '0')} AM'
-                              : 'N/A',
+                          weather.sunrise ?? '',
+
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: .7),
                           ),
                         ),
                       ],
@@ -231,13 +222,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          weather.sunset != null
-                              ? '${weather.sunset!.hour}:${weather.sunset!.minute.toString().padLeft(2, '0')} PM'
-                              : 'N/A',
+                          weather.sunset ?? '',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: .7),
                           ),
                         ),
                       ],
@@ -248,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Divider(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withValues(alpha: .7),
             thickness: 1,
             height: 40,
             endIndent: 35,
@@ -276,11 +265,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${weather.tempMax?.celsius?.toInt() ?? 0}°C',
+                          weather.maxTemp?.toString() ?? '',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: .7),
                           ),
                         ),
                       ],
@@ -308,11 +297,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${weather.tempMin?.celsius?.toInt() ?? 0}°C',
+                          weather.minTemp?.toString() ?? '',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: .7),
                           ),
                         ),
                       ],
