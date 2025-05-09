@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:weather_app/bloc/location_event.dart';
-import 'package:weather_app/bloc/location_state.dart';
-import 'package:weather_app/models/weather_location.dart';
+import 'package:weather_app/bloc/location/location_event.dart';
+import 'package:weather_app/bloc/location/location_state.dart';
+import 'package:weather_app/models/favorite_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -23,12 +23,15 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       );
 
       if (response.statusCode == 200) {
+        print("API Response: ${response.body}");
+
         final List<dynamic> jsonData = json.decode(response.body);
-        final List<WeatherLocation> locations =
-            jsonData.map((e) => WeatherLocation.fromJson(e)).toList();
+        final List<FavoriteModel> locations =
+            jsonData.map((e) => FavoriteModel.fromJson(e)).toList();
         emit(
           state.copyWith(status: LocationStatus.success, locations: locations),
         );
+        print("API Response: ${locations.length}");
       } else {
         emit(
           state.copyWith(
@@ -38,6 +41,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         );
       }
     } catch (e) {
+      print(e);
       emit(state.copyWith(status: LocationStatus.failure, error: e.toString()));
     }
   }

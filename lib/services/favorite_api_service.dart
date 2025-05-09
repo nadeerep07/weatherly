@@ -1,38 +1,64 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:weather_app/models/favorite_model.dart';
 
-class FavoritesApiService {
-  final String baseUrl = 'https://api.example.com/favorites';
+class Api {
+  static const baseUrl = 'http://10.0.15.198:3000/api/';
 
-  Future<Favorite> addToFavorites(Favorite favorite) async {
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(favorite.toJson()),
-    );
+  static addFavorite(FavoriteModel location) async {
+    print("Adding to favorites: ${location.name}");
 
-    if (response.statusCode == 201) {
-      return Favorite.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to add favorite');
+    var url = Uri.parse('${baseUrl}add_favorite');
+
+    try {
+      final res = await http.post(
+        url,
+        body: {
+          'cityname': location.name,
+          'countryname': location.country,
+          'regionname': location.region,
+        },
+      );
+      if (res.statusCode == 200) {
+        var data = jsonDecode(res.body.toString());
+        print("Response: ${data}");
+      } else {
+        print("Error: ${res.statusCode}");
+      }
+    } catch (e) {
+      print("Error: ${e.toString()}");
     }
   }
 
-  // Example method to add an item to favorites
-  Future<void> addFavorite(String item) async {
-    // Simulate a network call
-    await Future.delayed(Duration(seconds: 1));
-    print('$item added to favorites');
-  }
+  static getFavorite() async {
+    List<FavoriteModel> favoriteLocations = [];
+    var url = Uri.parse('${baseUrl}get_favorite');
+    try {
+      final res = await http.get(url);
 
-  // Example method to remove an item from favorites
-  Future<void> removeFavorite(String item) async {
-    // Simulate a network call
-    await Future.delayed(Duration(seconds: 1));
-    print('$item removed from favorites');
+      if (res.statusCode == 200) {
+        print("Response: ${res.body}");
+        var data = jsonDecode(res.body);
+        data['favorite'].forEach(
+          (value) => {
+            favoriteLocations.add(
+              FavoriteModel(
+                name: value['name'],
+                country: value['country'],
+                region: value['region'],
+              ),
+            ),
+          },
+        );
+        return favoriteLocations;
+      } else {
+        print('Error: ${res.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print("Error: ${e.toString()}");
+      return [];
+    }
   }
 }

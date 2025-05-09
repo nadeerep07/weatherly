@@ -1,37 +1,19 @@
-class Favorite {
-  final String id;
-  final String cityName;
-  final double temperature;
-  final String weatherIcon;
-  final DateTime createdAt;
 
-  Favorite({
-    required this.id,
-    required this.cityName,
-    required this.temperature,
-    required this.weatherIcon,
-    required this.createdAt,
+class FavoriteModel {
+  final String name;
+  final String region;
+  final String country;
+  FavoriteModel({
+    required this.name,
+    required this.region,
+    required this.country,
   });
 
-  factory Favorite.fromJson(Map<String, dynamic> json) {
-    return Favorite(
-      id: json['id'] ?? '',
-      cityName: json['cityName'] ?? 'Unknown',
-      temperature: (json['temperature'] as num?)?.toDouble() ?? 0.0,
-      weatherIcon: json['weatherIcon'] ?? '01d',
-      createdAt: DateTime.parse(
-        json['createdAt'] ?? DateTime.now().toIso8601String(),
-      ),
+  factory FavoriteModel.fromJson(Map<String, dynamic> json) {
+    return FavoriteModel(
+      name: json['name'],
+      region: json['region'],
+      country: json['country'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'cityName': cityName,
-      'temperature': temperature,
-      'weatherIcon': weatherIcon,
-      'createdAt': createdAt.toIso8601String(),
-    };
   }
 }

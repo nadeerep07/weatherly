@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:weather_app/models/weather_location.dart';
+import 'package:weather_app/models/favorite_model.dart';
 
 enum LocationStatus { initial, loading, success, failure }
 
 class LocationState extends Equatable {
   final LocationStatus status;
-  final List<WeatherLocation> locations;
+  final List<FavoriteModel> locations;
   final String error;
 
   const LocationState({
@@ -16,7 +16,7 @@ class LocationState extends Equatable {
 
   LocationState copyWith({
     LocationStatus? status,
-    List<WeatherLocation>? locations,
+    List<FavoriteModel>? locations,
     String? error,
   }) {
     return LocationState(

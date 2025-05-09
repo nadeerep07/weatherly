@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weather_app/bloc/navigation_cubit.dart';
-import 'package:weather_app/bloc/weather_bloc.dart';
+import 'package:weather_app/bloc/weather/weather_bloc.dart';
 import 'package:weather_app/models/weather_data.dart';
-import 'package:weather_app/view/favorities_screen.dart';
+import 'package:weather_app/view/favorites_screen.dart';
+import 'package:weather_app/view/search_screen.dart';
 import 'package:weather_app/widgets/colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+
   @override
   Widget build(BuildContext context) {
     final isDaytime = DateTime.now().hour >= 6 && DateTime.now().hour < 18;
@@ -54,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     index: currentIndex,
                     children: [
                       _buildWeatherContent(context, colors, isDaytime, state),
+                      const SearchScreen(),
                       const FavoritesScreen(),
                     ],
                   );
@@ -78,6 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: 'Weather',
                 ),
                 BottomNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  label: 'Search',
+                ),
+                  BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: 'Favorites',
                 ),
@@ -265,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          weather.maxTemp?.toString() ?? '',
+                          '${weather.maxTemp?.toString() ?? ''}°C ',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,
@@ -297,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          weather.minTemp?.toString() ?? '',
+                          ' ${weather.minTemp?.toString() ?? ''}°C ',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w300,

@@ -8,8 +8,7 @@ import 'package:weather_app/models/weather_data.dart';
 part 'weather_event.dart';
 part 'weather_state.dart';
 
-String apiKey = '9ca20e8f496973351b7bb12a0891fa50';
-String apiKey1 = 'aae948700819404e98f41021250905';
+String apiKey = 'aae948700819404e98f41021250905';
 
 class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   WeatherBloc() : super(WeatherState.initial()) {
@@ -19,7 +18,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
       try {
         final response = await http.get(
           Uri.parse(
-            'https://api.weatherapi.com/v1/forecast.json?key=$apiKey1&q=${event.position.latitude},${event.position.longitude}',
+            'https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=${event.position.latitude},${event.position.longitude}',
           ),
         );
 
@@ -27,6 +26,42 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           final Map<String, dynamic> json = jsonDecode(response.body);
           final weather = WeatherData.fromJson(json);
           print(weather.sunrise);
+          emit(
+            state.copyWith(
+              weatherStatus: WeatherStatus.success,
+              weather: weather,
+            ),
+          );
+        } else {
+          emit(
+            state.copyWith(
+              weatherStatus: WeatherStatus.failure,
+              errorMessage: 'Failed to load weather data',
+            ),
+          );
+        }
+      } catch (e) {
+        emit(
+          state.copyWith(
+            weatherStatus: WeatherStatus.failure,
+            errorMessage: e.toString(),
+          ),
+        );
+      }
+    });
+
+    on<FetchWeatherLocationEvent>((event, emit) async {
+      emit(state.copyWith(weatherStatus: WeatherStatus.loading));
+      try {
+        final response = await http.get(
+          Uri.parse(
+            'https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=${event.locationName}',
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          final json = jsonDecode(response.body);
+          final weather = WeatherData.fromJson(json);
           emit(
             state.copyWith(
               weatherStatus: WeatherStatus.success,
