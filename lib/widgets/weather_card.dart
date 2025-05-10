@@ -16,7 +16,7 @@ class WeatherCard extends StatelessWidget {
           Icons.location_city,
           color: Colors.blue,),
         title: Text(weather.city),
-        subtitle: Text('${weather.region}°C - ${weather.country}'),
+        subtitle: Text('${weather.region} - ${weather.country}'),
        trailing: Text(
           '${weather.tempC}°C',
           style: const TextStyle(
@@ -25,10 +25,10 @@ class WeatherCard extends StatelessWidget {
           ),
         ),
         onTap: () {
-          // Handle tap event, e.g., navigate to detail screen
+       
         },
         onLongPress: () {
-          // Handle long press event, e.g., show options to remove from favorites
+         
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

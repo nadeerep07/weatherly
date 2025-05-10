@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -29,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 3), () {
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacementNamed(context, '/home');
     });
   }
@@ -65,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
                     shadows: [
                       Shadow(
                         blurRadius: 10.0,
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: .3),
                         offset: const Offset(0, 4),
                       ),
                     ],

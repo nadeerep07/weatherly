@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather_app/bloc/favorites/favorites_bloc.dart';
 import 'package:weather_app/bloc/location/location_bloc.dart';
 import 'package:weather_app/bloc/searching_location/location_searching_bloc.dart';
 import 'package:weather_app/bloc/search_query_cubit.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<LocationSearchingBloc>(
           create: (context) => LocationSearchingBloc(),
         ),
+        BlocProvider<FavoritesBloc>(create: (context) => FavoritesBloc(),)
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
